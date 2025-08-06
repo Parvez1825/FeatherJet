@@ -1,2 +1,2 @@
 # FeatherJet
-FeatherJet - evoking lightness
+FeatherJet - evoking lightness for webserver
