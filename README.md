@@ -319,10 +319,7 @@ java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005 -jar fea
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
-
-- Inspired by Apache Tomcat's architecture
-- Built with performance and simplicity in mind
-- Thanks to the Java community for excellent libraries
+- Special thanks to Sakshi (https://github.com/SakshiP3103) for contributions to this project.
 
 ## 📞 Support
 
