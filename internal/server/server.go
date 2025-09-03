@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"path/filepath"
-	"strconv"
 	"time"
 
 	"github.com/featherjet/featherjet/internal/config"
