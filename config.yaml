@@ -1,0 +1,20 @@
+# FeatherJet Configuration
+server:
+  host: "0.0.0.0"
+  port: 8080
+  read_timeout: "30s"
+  write_timeout: "30s"
+  idle_timeout: "120s"
+
+static:
+  directory: "./public"
+  cache_max_age: "3600" # Cache static files for 1 hour
+
+logging:
+  level: "info" # debug, info, warn, error
+  enable_request_logging: true
+
+# Middleware settings
+middleware:
+  enable_cors: true
+  enable_compression: false # Set to true to enable gzip compression

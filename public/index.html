@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FeatherJet - Lightweight Web Server</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="nav-brand">
+                <h1>🚀 FeatherJet</h1>
+                <p>Lightweight Web Server</p>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#api">API</a></li>
+                <li><a href="#docs">Docs</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <h2>Fast, Simple, Cross-Platform</h2>
+                <p>FeatherJet is a lightweight web server written in Go, designed to serve static files and backend APIs with minimal configuration.</p>
+                <div class="hero-buttons">
+                    <button onclick="testAPI()" class="btn btn-primary">Test API</button>
+                    <button onclick="getServerInfo()" class="btn btn-secondary">Server Info</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="features">
+            <div class="container">
+                <h3>Key Features</h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4>🌐 Static File Serving</h4>
+                        <p>Efficiently serve HTML, CSS, JS, and other static assets with proper caching headers.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🔗 REST API Support</h4>
+                        <p>Built-in routing for REST endpoints with JSON responses and middleware support.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>⚙️ Configurable</h4>
+                        <p>Easy configuration via YAML files for ports, directories, logging, and middleware.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🔒 Security Headers</h4>
+                        <p>Built-in security middleware with CORS support and common security headers.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>📊 Request Logging</h4>
+                        <p>Comprehensive request logging with method, path, status code, and response time.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🚀 Cross-Platform</h4>
+                        <p>Runs seamlessly on Linux, Windows, and macOS with zero dependencies.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="api" class="api-section">
+            <div class="container">
+                <h3>API Endpoints</h3>
+                <div class="api-list">
+                    <div class="api-item">
+                        <span class="method get">GET</span>
+                        <code>/api/hello</code>
+                        <span class="description">Simple hello world endpoint</span>
+                    </div>
+                    <div class="api-item">
+                        <span class="method get">GET</span>
+                        <code>/api/status</code>
+                        <span class="description">Server health and status check</span>
+                    </div>
+                    <div class="api-item">
+                        <span class="method get">GET</span>
+                        <code>/api/info</code>
+                        <span class="description">Detailed server configuration info</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="response-section">
+            <div class="container">
+                <h3>API Response</h3>
+                <pre id="api-response" class="response-box">Click "Test API" or "Server Info" to see responses here...</pre>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 FeatherJet - Open Source Web Server</p>
+            <p>Built with ❤️ and Go</p>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
