@@ -245,6 +245,11 @@ Combine both approaches:
 - Add API endpoints for backend functionality
 - Frontend JavaScript can call `/api/*` endpoints
 
+## ⚠️Note on Port Configuration
+By default, the FeatherJet server runs on port 8080. In this setup, it has been reconfigured to run on port 8081 to allow the Velocity Tasks application to use port 8080.
+
+If your application only relies on FeatherJet capabilities and does not require Velocity Taska, you may revert FeatherJet back to its default port from `config.yaml`
+
 ## 🧪 Running Tests
 
 ### Unit Tests
@@ -513,5 +518,6 @@ SOFTWARE.
 - **Inspiration**: Apache Tomcat, NGINX, and other web servers
 
 ---
+
 
 **Happy serving with FeatherJet! 🚀**
