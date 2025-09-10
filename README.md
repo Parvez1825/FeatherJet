@@ -102,7 +102,7 @@ FeatherJet/
    ```bash
    ./featherjet
    ```
-   Server will start on `http://localhost:8080`
+   Server will start on `http://localhost:8081`
 
 2. **Use custom configuration**:
    ```bash
@@ -110,7 +110,7 @@ FeatherJet/
    ```
 
 3. **View the demo application**:
-   Open your browser to `http://localhost:8080` to see the included demo application.
+   Open your browser to `http://localhost:8081` to see the included demo application.
 
 ### Platform-Specific Instructions
 
@@ -143,7 +143,7 @@ FeatherJet uses a YAML configuration file (`config.yaml` by default):
 # Server settings
 server:
   host: "localhost"          # Bind address (0.0.0.0 for all interfaces)
-  port: 8080                # Port to listen on
+  port: 8081                # Port to listen on
   read_timeout: "30s"       # Request read timeout
   write_timeout: "30s"      # Response write timeout  
   idle_timeout: "120s"      # Keep-alive timeout
@@ -169,7 +169,7 @@ middleware:
 | Section | Option | Default | Description |
 |---------|--------|---------|-------------|
 | `server.host` | string | `localhost` | Server bind address |
-| `server.port` | int | `8080` | Server port |
+| `server.port` | int | `8081` | Server port |
 | `server.read_timeout` | duration | `30s` | Request read timeout |
 | `server.write_timeout` | duration | `30s` | Response write timeout |
 | `server.idle_timeout` | duration | `120s` | Connection idle timeout |
@@ -201,8 +201,12 @@ middleware:
    static:
      directory: "./my-app"
    ```
+3. **OR replace the Featherjet public to Velocity Task static content**:
+   ```bash
+      cp -r $HOME/VelocityTasks/web/* $HOME/FeatherJet/public/
+      ```
 
-3. **Start FeatherJet**:
+4. **Start FeatherJet**:
    ```bash
    ./featherjet
    ```
@@ -214,18 +218,17 @@ middleware:
    // Add to setupRoutes() method
    s.mux.HandleFunc("/api/users", s.handleUsers)
    s.mux.HandleFunc("/api/products", s.handleProducts)
+   s.mux.HandleFunc("/api/tasks/", s.handleTasksProxy)
+	s.mux.HandleFunc("/api/tasks", s.handleTasksProxy)
    ```
 
 2. **Implement handler methods**:
+  
    ```go
-   func (s *Server) handleUsers(w http.ResponseWriter, r *http.Request) {
-       // Your API logic here
-       response := map[string]interface{}{
-           "users": []string{"alice", "bob", "charlie"},
-       }
-       
-       w.Header().Set("Content-Type", "application/json")
-       json.NewEncoder(w).Encode(response)
+   func (s *Server) handleTasksProxy(w http.ResponseWriter, r *http.Request) {
+    target, _ := url.Parse("http://localhost:8080") // Replace PORT with VelocityTasks port
+    proxy := httputil.NewSingleHostReverseProxy(target)
+    proxy.ServeHTTP(w, r)
    }
    ```
 
@@ -238,9 +241,14 @@ middleware:
 ### Full-Stack Application
 
 Combine both approaches:
-- Place frontend files in the static directory
+- Place frontend files in the the featherjet public folder
 - Add API endpoints for backend functionality
 - Frontend JavaScript can call `/api/*` endpoints
+
+## ⚠️Note on Port Configuration
+By default, the FeatherJet server runs on port 8080. In this setup, it has been reconfigured to run on port 8081 to allow the Velocity Tasks application to use port 8080.
+
+If your application only relies on FeatherJet capabilities and does not require Velocity Taska, you may revert FeatherJet back to its default port from `config.yaml`
 
 ## 🧪 Running Tests
 
@@ -265,9 +273,9 @@ go test ./tests/server_test.go
 ./featherjet -config test-config.yaml &
 
 # Run your integration tests
-curl http://localhost:8080/api/hello
-curl http://localhost:8080/api/status
-curl http://localhost:8080/api/info
+curl http://localhost:8081/api/hello
+curl http://localhost:8081/api/status
+curl http://localhost:8081/api/info
 
 # Stop test server
 pkill featherjet
@@ -276,13 +284,13 @@ pkill featherjet
 ### Load Testing
 ```bash
 # Using Apache Bench (ab)
-ab -n 1000 -c 10 http://localhost:8080/
+ab -n 1000 -c 10 http://localhost:8081/
 
 # Using wrk
-wrk -t12 -c400 -d30s http://localhost:8080/
+wrk -t12 -c400 -d30s http://localhost:8081/
 
 # Using curl for API endpoints
-for i in {1..100}; do curl http://localhost:8080/api/hello; done
+for i in {1..100}; do curl http://localhost:8081/api/hello; done
 ```
 
 ## 🏗️ Development
@@ -403,7 +411,7 @@ Detailed server configuration and runtime information.
     "name": "FeatherJet",
     "version": "1.0.0", 
     "host": "localhost",
-    "port": 8080
+    "port": 8081
   },
   "static": {
     "directory": "./public",
@@ -510,5 +518,6 @@ SOFTWARE.
 - **Inspiration**: Apache Tomcat, NGINX, and other web servers
 
 ---
+
 
 **Happy serving with FeatherJet! 🚀**

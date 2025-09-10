@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"os"
 	"time"
+	"net/http/httputil"
+    "net/url"
 
 	"github.com/featherjet/featherjet/internal/config"
 	"github.com/featherjet/featherjet/internal/middleware"
@@ -44,12 +46,20 @@ func New(cfg *config.Config) *Server {
 	return server
 }
 
+func (s *Server) handleTasksProxy(w http.ResponseWriter, r *http.Request) {
+    target, _ := url.Parse("http://localhost:8080") // Replace PORT with VelocityTasks port
+    proxy := httputil.NewSingleHostReverseProxy(target)
+    proxy.ServeHTTP(w, r)
+}
+
 // setupRoutes configures the server routes
 func (s *Server) setupRoutes() {
 	// API routes
 	s.mux.HandleFunc("/api/hello", s.handleHello)
 	s.mux.HandleFunc("/api/status", s.handleStatus)
 	s.mux.HandleFunc("/api/info", s.handleInfo)
+	s.mux.HandleFunc("/api/tasks/", s.handleTasksProxy)
+	s.mux.HandleFunc("/api/tasks", s.handleTasksProxy)  // Proxy to VelocityTasks
 
 	// Static file handler
 	staticHandler := s.createStaticFileHandler()
