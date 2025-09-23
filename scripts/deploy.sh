@@ -2,7 +2,7 @@
 set -e
 
 # Define the repository path in a user's home directory
-REPO_PATH="/home/ubuntu/featherjet"
+REPO_PATH="/home/ubuntu/velocity-tasks"
 
 # Ensure Go is installed
 if ! command -v go &> /dev/null; then
@@ -19,29 +19,35 @@ if [ ! -d "$REPO_PATH" ]; then
 else
   echo "Repository already exists. Pulling latest changes..."
   cd "$REPO_PATH"
-  git pull origin main
+  # Attempt to pull, and if it fails, remove the directory and re-clone.
+  if ! git pull origin main; then
+    echo "Git pull failed. Repository may be corrupted. Removing and re-cloning..."
+    cd ..
+    sudo rm -rf "$REPO_PATH"
+    git clone https://github.com/Parvez1825/FeatherJet.git "$REPO_PATH"
+  fi
 fi
 
-# Navigate into the repository directory to ensure all commands are run from the correct location
+# The rest of the script needs to be able to access the repo.
+# It is a good practice to use 'cd' to the repo path.
 cd "$REPO_PATH"
 
-# Build Go application from the FeatherJet source code.
-# The executable is named 'featherjet' to be consistent with the application name.
-go build -o featherjet ./cmd/featherjet
+# Build Go application
+go build -o velocity-tasks ./cmd/featherjet
 
 # Create systemd service if it doesn't exist
-SERVICE_FILE="/etc/systemd/system/featherjet.service"
+SERVICE_FILE="/etc/systemd/system/velocity-tasks.service"
 if [ ! -f "$SERVICE_FILE" ]; then
   sudo tee $SERVICE_FILE > /dev/null <<'SERVICE'
 [Unit]
-Description=FeatherJet Web Server
+Description=Velocity Tasks Service
 After=network.target
 
 [Service]
 Type=simple
 User=ubuntu
-WorkingDirectory=/home/ubuntu/featherjet
-ExecStart=/home/ubuntu/featherjet/featherjet
+WorkingDirectory=/home/ubuntu/velocity-tasks
+ExecStart=/home/ubuntu/velocity-tasks/velocity-tasks
 Restart=on-failure
 
 [Install]
@@ -49,7 +55,9 @@ WantedBy=multi-user.target
 SERVICE
 
   sudo systemctl daemon-reload
-  sudo systemctl enable featherjet
+  sudo systemctl enable velocity-tasks
 fi
-# Restart the service to apply the new changes
-sudo systemctl restart featherjet
+
+# Restart the service
+sudo systemctl restart velocity-tasks
+ore-iehr-qeh
