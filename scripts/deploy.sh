@@ -3,7 +3,7 @@ set -e
 
 # Define repository path
 REPO_PATH="/home/ubuntu/velocity-tasks"
-REPO_URL="https://github.com/PottaAkhil/velocity-tasks.git"
+REPO_URL="https://github.com/Parvez1825/FeatherJet.git"
 
 # Ensure Go is installed
 if ! command -v go &> /dev/null; then
