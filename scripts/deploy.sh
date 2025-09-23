@@ -1,43 +1,44 @@
 #!/bin/bash
 set -e
 
-# Define repository path
+# Define the repository path in a user's home directory
 REPO_PATH="/home/ubuntu/velocity-tasks"
-REPO_URL="https://github.com/Parvez1825/FeatherJet.git"
 
 # Ensure Go is installed
 if ! command -v go &> /dev/null; then
   sudo apt update
-  sudo apt install -y golang-go git
+  sudo apt install -y golang-go
 fi
 
-# Clone or update the repo
+# Clone the repo into the designated path if it doesn't exist.
+# Otherwise, navigate to the folder and pull the latest changes.
 if [ ! -d "$REPO_PATH" ]; then
-  echo "Cloning repository..."
-  git clone "$REPO_URL" "$REPO_PATH"
+  echo "Cloning the repository into $REPO_PATH..."
+  mkdir -p "$REPO_PATH"
+  git clone https://github.com/Parvez1825/FeatherJet.git "$REPO_PATH"
 else
-  echo "Repository exists. Pulling latest changes..."
+  echo "Repository already exists. Pulling latest changes..."
   cd "$REPO_PATH"
+  # Attempt to pull, and if it fails, remove the directory and re-clone.
   if ! git pull origin main; then
-    echo "Git pull failed. Re-cloning..."
+    echo "Git pull failed. Repository may be corrupted. Removing and re-cloning..."
     cd ..
     sudo rm -rf "$REPO_PATH"
-    git clone "$REPO_URL" "$REPO_PATH"
+    git clone https://github.com/Parvez1825/FeatherJet.git "$REPO_PATH"
   fi
 fi
 
+# The rest of the script needs to be able to access the repo.
+# It is a good practice to use 'cd' to the repo path.
 cd "$REPO_PATH"
 
-###########################
-# Build Velocity Tasks
-###########################
-echo "Building velocity-tasks..."
+# Build Go application
 go build -o velocity-tasks ./cmd/featherjet
 
-# Velocity Tasks systemd service
-VELOCITY_SERVICE="/etc/systemd/system/velocity-tasks.service"
-if [ ! -f "$VELOCITY_SERVICE" ]; then
-  sudo tee "$VELOCITY_SERVICE" > /dev/null <<SERVICE
+# Create systemd service if it doesn't exist
+SERVICE_FILE="/etc/systemd/system/velocity-tasks.service"
+if [ ! -f "$SERVICE_FILE" ]; then
+  sudo tee $SERVICE_FILE > /dev/null <<'SERVICE'
 [Unit]
 Description=Velocity Tasks Service
 After=network.target
@@ -45,8 +46,8 @@ After=network.target
 [Service]
 Type=simple
 User=ubuntu
-WorkingDirectory=$REPO_PATH
-ExecStart=$REPO_PATH/velocity-tasks
+WorkingDirectory=/home/ubuntu/velocity-tasks
+ExecStart=/home/ubuntu/velocity-tasks/velocity-tasks
 Restart=on-failure
 
 [Install]
@@ -56,36 +57,7 @@ SERVICE
   sudo systemctl daemon-reload
   sudo systemctl enable velocity-tasks
 fi
+
+# Restart the service
 sudo systemctl restart velocity-tasks
-
-###########################
-# Build FeatherJet
-###########################
-echo "Building featherjet..."
-go build -o featherjet ./cmd/featherjet
-
-# FeatherJet systemd service
-FEATHERJET_SERVICE="/etc/systemd/system/featherjet.service"
-if [ ! -f "$FEATHERJET_SERVICE" ]; then
-  sudo tee "$FEATHERJET_SERVICE" > /dev/null <<SERVICE
-[Unit]
-Description=FeatherJet Web Server
-After=network.target
-
-[Service]
-Type=simple
-User=ubuntu
-WorkingDirectory=$REPO_PATH
-ExecStart=$REPO_PATH/featherjet
-Restart=on-failure
-
-[Install]
-WantedBy=multi-user.target
-SERVICE
-
-  sudo systemctl daemon-reload
-  sudo systemctl enable featherjet
-fi
-sudo systemctl restart featherjet
-
-echo "Deployment complete: velocity-tasks & featherjet running."
+ore-iehr-qeh
