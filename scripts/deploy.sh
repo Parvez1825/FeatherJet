@@ -25,7 +25,11 @@ fi
 
 cd "$REPO_PATH"
 
-# Build binary
+#  Make sure static files (like index.html) are up to date
+echo "Refreshing static assets..."
+git checkout main -- static/ || true
+
+# Build binary (needed if you use //go:embed or changed Go code)
 echo "Building FeatherJet..."
 go build -o featherjet ./cmd/featherjet
 
