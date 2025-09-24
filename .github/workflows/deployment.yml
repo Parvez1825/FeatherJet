@@ -33,3 +33,5 @@ jobs:
       - name: Deploy via script
         run: |
           ssh -v -o StrictHostKeyChecking=no ${{ secrets.EC2_HOST }} 'bash -s' < scripts/deploy.sh
+
+          
