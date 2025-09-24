@@ -1,38 +1,38 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
-# Define the repository path in a user's home directory
 REPO_PATH="/home/ubuntu/featherjet"
+SERVICE_FILE="/etc/systemd/system/featherjet.service"
 
 # Ensure Go is installed
 if ! command -v go &> /dev/null; then
-  sudo apt update
-  sudo apt install -y golang-go
+  echo "Installing Go..."
+  sudo DEBIAN_FRONTEND=noninteractive apt-get update -y
+  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y golang-go
 fi
 
-# Clone the repo into the designated path if it doesn't exist.
-# Otherwise, navigate to the folder and pull the latest changes.
-if [ ! -d "$REPO_PATH" ]; then
-  echo "Cloning the repository into $REPO_PATH..."
+# Clone or update repo
+if [ ! -d "$REPO_PATH/.git" ]; then
+  echo "Cloning FeatherJet into $REPO_PATH..."
   mkdir -p "$REPO_PATH"
   git clone https://github.com/Parvez1825/FeatherJet.git "$REPO_PATH"
 else
-  echo "Repository already exists. Pulling latest changes..."
+  echo "Updating existing repo..."
   cd "$REPO_PATH"
-  git pull origin main
+  git fetch origin main
+  git reset --hard origin/main
 fi
 
-# Navigate into the repository directory to ensure all commands are run from the correct location
 cd "$REPO_PATH"
 
-# Build Go application from the FeatherJet source code.
-# The executable is named 'featherjet' to be consistent with the application name.
+# Build binary
+echo "Building FeatherJet..."
 go build -o featherjet ./cmd/featherjet
 
-# Create systemd service if it doesn't exist
-SERVICE_FILE="/etc/systemd/system/featherjet.service"
+# Create systemd service if missing
 if [ ! -f "$SERVICE_FILE" ]; then
-  sudo tee $SERVICE_FILE > /dev/null <<'SERVICE'
+  echo "Creating systemd service..."
+  sudo tee "$SERVICE_FILE" > /dev/null <<'SERVICE'
 [Unit]
 Description=FeatherJet Web Server
 After=network.target
@@ -51,5 +51,11 @@ SERVICE
   sudo systemctl daemon-reload
   sudo systemctl enable featherjet
 fi
-# Restart the service to apply the new changes
-sudo systemctl restart featherjet
+
+# Restart service if it exists
+if systemctl list-unit-files | grep -q featherjet.service; then
+  echo "Restarting FeatherJet service..."
+  sudo systemctl restart featherjet || sudo systemctl status featherjet -n 50
+else
+  echo "featherjet.service not found, skipping restart."
+fi
