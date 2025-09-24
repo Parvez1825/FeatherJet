@@ -27,10 +27,6 @@ jobs:
           sudo apt-get install -y dos2unix
           dos2unix scripts/deploy.sh
 
-      - name: Try SSH command on EC2
-        run: |
-          ssh -v -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} 'whoami; hostname; pwd'
       - name: Deploy via script
         run: |
           ssh -v -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} 'bash -s' < scripts/deploy.sh
-
