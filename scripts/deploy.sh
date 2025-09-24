@@ -25,11 +25,15 @@ fi
 
 cd "$REPO_PATH"
 
+# Ensure public folder is updated
+echo "Refreshing public assets..."
+git checkout main -- public/ || true
+
 # Build binary
 echo "Building FeatherJet..."
 go build -o featherjet ./cmd/featherjet
 
-# Always ensure systemd service is present (create or overwrite)
+# Create or update systemd service
 echo "Ensuring systemd service exists..."
 sudo tee "$SERVICE_FILE" > /dev/null <<'SERVICE'
 [Unit]
@@ -54,3 +58,7 @@ sudo systemctl enable featherjet
 echo "Restarting FeatherJet service..."
 sudo systemctl restart featherjet
 sudo systemctl status featherjet --no-pager -n 20
+
+# Debug: Show first 10 lines of deployed index.html
+echo "Deployed index.html preview:"
+head -n 10 "$REPO_PATH/public/index.html"
