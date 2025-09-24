@@ -25,18 +25,13 @@ fi
 
 cd "$REPO_PATH"
 
-#  Make sure static files (like index.html) are up to date
-echo "Refreshing static assets..."
-git checkout main -- static/ || true
-
-# Build binary (needed if you use //go:embed or changed Go code)
+# Build binary
 echo "Building FeatherJet..."
 go build -o featherjet ./cmd/featherjet
 
-# Create systemd service if missing
-if [ ! -f "$SERVICE_FILE" ]; then
-  echo "Creating systemd service..."
-  sudo tee "$SERVICE_FILE" > /dev/null <<'SERVICE'
+# Always ensure systemd service is present (create or overwrite)
+echo "Ensuring systemd service exists..."
+sudo tee "$SERVICE_FILE" > /dev/null <<'SERVICE'
 [Unit]
 Description=FeatherJet Web Server
 After=network.target
@@ -52,14 +47,10 @@ Restart=on-failure
 WantedBy=multi-user.target
 SERVICE
 
-  sudo systemctl daemon-reload
-  sudo systemctl enable featherjet
-fi
+sudo systemctl daemon-reload
+sudo systemctl enable featherjet
 
-# Restart service if it exists
-if systemctl list-unit-files | grep -q featherjet.service; then
-  echo "Restarting FeatherJet service..."
-  sudo systemctl restart featherjet || sudo systemctl status featherjet -n 50
-else
-  echo "featherjet.service not found, skipping restart."
-fi
+# Restart service
+echo "Restarting FeatherJet service..."
+sudo systemctl restart featherjet
+sudo systemctl status featherjet --no-pager -n 20
